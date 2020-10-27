@@ -1,0 +1,26 @@
+{
+  "name": "grep-wss",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node node_modules/tape/bin/tape src/*.test.ts",
+    "coverage": "nyc npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yishengjiang99/grep-wss.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yishengjiang99/grep-wss/issues"
+  },
+  "homepage": "https://github.com/yishengjiang99/grep-wss#readme",
+  "devDependencies": {
+    "@types/tape": "^4.13.0",
+    "istanbul": "^0.4.5",
+    "nyc": "^15.1.0",
+    "tape": "^5.0.1"
+  }
+}
