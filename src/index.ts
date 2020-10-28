@@ -1,6 +1,2 @@
-import { WebSocketServer, WebSocketServerProps} from './server';
-import { wscat } from './wsclient';
-
-module.exports={
-    WebSocketServer
-}
+export { WebSocketServer, WebSocketServerProps} from './server';
+export { wscat } from './wsclient';

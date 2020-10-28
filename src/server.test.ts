@@ -1,9 +1,5 @@
 export {};
-import test from 'tape';
-import {Writable} from 'stream';
-import {Socket, createConnection} from 'net';
 import { WebSocketServer } from './server';
-import { wscat } from './wsclient';
 import {IncomingMessage,ServerResponse} from 'http';
 
 WebSocketServer({
