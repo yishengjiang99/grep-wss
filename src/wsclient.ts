@@ -1,11 +1,11 @@
-import {spawn} from 'child_process';
-
-export function wscat(host:string = 'localhost', port:number = 3000) {
+import {spawn,ChildProcess} from 'child_process';
+import {createInterface,Interface} from 'readline' ;
+export function wscat(host:string = 'localhost', port:number = 3000):Interface{
     const nc = spawn("nc", [host, port+'']);
-    nc.stdin.on("pipe", () => {
+    nc.stdout.on("pipe", () => {
       nc.stdin.write(
-        `GET ws://localhost:${port}/ HTTP/1.1\r\n` +
-          `Host: localhost:${port}\r\n` +
+        `GET ws://${host}:${port}/ HTTP/1.1\r\n` +
+          `Host: ${host}:${port}\r\n` +
           "Connection: Upgrade\r\n" +
           "Upgrade: websocket\r\n" +
           "Sec-WebSocket-Key: ytXUbOG6G/3lEbiqv7Bwzg==\r\n" +
@@ -13,11 +13,7 @@ export function wscat(host:string = 'localhost', port:number = 3000) {
       );
     });
     const hexdump = spawn("hexdump");
-    nc.stdout.pipe(process.stdout);
-    nc.stdout.on("error", (d) => {
-      process.stdout.write(d.toString());
-    });
-  
-    process.stdin.pipe(nc.stdin);
+    nc.stdout.pipe(hexdump.stdin);
+    return createInterface(hexdump.stdout, nc.stdin);
   }
   

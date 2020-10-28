@@ -1,7 +1,6 @@
 export {};
 import { write, header, generator } from './encoder';
 import test from 'tape';
-import {Writable} from 'stream';
 
 test("headerFrame",function(t){
 

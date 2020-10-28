@@ -1,7 +1,11 @@
 declare module "grep-wss"{
-  import {WebSocketServer, WebSocketServerProps} from ".";
-
-  function WebSocketServer(props:WebSocketServerProps): void;
+  import {Socket} from 'net';
+  function WebSocketServer({
+    port: number,
+    onHttp: any,
+    onConnection: any,
+    onData: any
+  }):void;
 }
 
 

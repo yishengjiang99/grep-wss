@@ -9,12 +9,10 @@ export const write=(socket: Writable, data:Buffer|string):void=>{
   const nextGen = typeof data==='string' ?  generator(Buffer.from(data),false) : generator(data,true);
   while(true){
     const result = nextGen.next();
-    console.log(result);
     if(result.done || !result.value) break;
     const  [header,body] = result.value;
     socket.write(Buffer.concat([header,body]))
   }
-  socket.end();
 }
 
 export function header(length:number, isBinary:boolean, isFirst:boolean, isLast:boolean, isMasked:boolean=false){
