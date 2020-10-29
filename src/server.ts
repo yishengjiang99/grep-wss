@@ -8,8 +8,8 @@ import {decodeWsMessage} from './decoder';
 type ReplyFunction = (msg: string|Buffer)=>void;
 export interface WebSocketServerProps{
   onHttp?: (req: IncomingMessage, res:ServerResponse)=>void,
-  onData?: (data:Buffer, reply:ReplyFunction )=>void,
-  onConnection?: (reply:ReplyFunction)=>void,
+  onData?: (data:Buffer, reply:ReplyFunction, session?:Record<string,any>, socket?:Socket )=>void,
+  onConnection?: (reply:ReplyFunction, session?:Record<string,any>, socket?:Socket)=>void,
   onListening?:()=>void,
   port: number,
 }
@@ -21,15 +21,16 @@ export function WebSocketServer(props: WebSocketServerProps): Server {
   });
   
   httpd.on("upgrade", (req:IncomingMessage, socket: Socket) => {
+    const session = {};
     const reply:ReplyFunction = (msg: Buffer|string)=>{
       writeReply(socket, msg);
     }
     shakeHand(socket,req.headers["sec-websocket-key"]!.trim());
-    onConnection && onConnection(reply);
+    onConnection && onConnection(reply,  session, socket);
     onData && socket.on("data", (d)=>{
       onData(decodeWsMessage(d), (msg)=>{
         writeReply(socket,msg);
-      });
+      }, session, socket);
     });
   });
   httpd.on("error",  console.error);
