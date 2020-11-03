@@ -46,7 +46,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generator = exports.header = exports.write = void 0;
 var FRAME_LENGTH = 1024 * 16;
 exports.write = function (socket, data) {
-    var nextGen = typeof data === 'string' ? generator(Buffer.from(data), false) : generator(data, true);
+    var nextGen = typeof data === "string"
+        ? generator(Buffer.from(data), false)
+        : generator(data, true);
     while (true) {
         var result = nextGen.next();
         if (result.done || !result.value)
@@ -59,21 +61,20 @@ function header(length, isBinary, isFirst, isLast, isMasked) {
     if (isMasked === void 0) { isMasked = false; }
     var optCode = isBinary ? 0x02 : 0x01;
     var b0 = (isFirst ? optCode : 0) + (isLast ? 0x80 : 0);
-    var b1 = isMasked ? 0x80 : 0 + length & 0x7f;
-    if (length <= 0x7E) {
-        return Buffer.from([b0, b1]);
+    if (length <= 0x7e) {
+        return Buffer.from([b0, length & 0x7f]);
     }
-    else if (length <= 0xFFFF) {
+    else if (length <= 0xffff) {
         var b = Buffer.alloc(4);
         b[0] = b0;
-        b[1] = b1;
+        b[1] = 0x7e;
         b.writeInt16BE(length, 2);
         return b;
     }
     else {
         var b = Buffer.alloc(10);
         b[0] = b0;
-        b[1] = b1;
+        b[1] = 0x7f;
         b.writeInt32BE((length & 0xffff0000) >> 8, 2);
         b.writeInt32BE(length & 0x0000ffff, 6);
         return b;
@@ -91,7 +92,7 @@ function generator(buff, isBinary) {
                 if (!(buff.byteLength > FRAME_LENGTH)) return [3 /*break*/, 3];
                 return [4 /*yield*/, [
                         header(FRAME_LENGTH, isBinary, isFirst, false, false),
-                        buff.slice(0, FRAME_LENGTH)
+                        buff.slice(0, FRAME_LENGTH),
                     ]];
             case 2:
                 _a.sent();

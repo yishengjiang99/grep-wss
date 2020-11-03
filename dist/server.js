@@ -11,15 +11,16 @@ function WebSocketServer(props) {
         onHttp ? onHttp(req, res) : res.end(200);
     });
     httpd.on("upgrade", function (req, socket) {
+        var session = {};
         var reply = function (msg) {
             encoder_1.write(socket, msg);
         };
         shakeHand(socket, req.headers["sec-websocket-key"].trim());
-        onConnection && onConnection(reply);
+        onConnection && onConnection(reply, session, socket);
         onData && socket.on("data", function (d) {
             onData(decoder_1.decodeWsMessage(d), function (msg) {
                 encoder_1.write(socket, msg);
-            });
+            }, session, socket);
         });
     });
     httpd.on("error", console.error);
