@@ -1,5 +1,5 @@
 export {};
-import { write, header, generator } from "./encoder";
+import { header, generator } from "./encoder";
 import test from "tape";
 import { createWriteStream, closeSync } from "fs";
 test("headerFrame", function (t) {
