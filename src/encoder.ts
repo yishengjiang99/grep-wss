@@ -1,33 +1,6 @@
-import { Socket } from "net";
-import { Writable, PassThrough, Transform } from "stream";
-import { EventEmitter } from "events";
-import { decodeWsMessage } from "./decoder";
 type Header = Buffer;
 type Body = Buffer;
 const FRAME_LENGTH = 1024 * 16;
-
-export class WsSocket extends EventEmitter {
-  socket: Socket;
-  constructor(socket: Socket) {
-    super();
-    this.socket = socket;
-  }
-  write(str: Uint8Array | string): boolean {
-    const nextGen =
-      typeof str === "string"
-        ? generator(Buffer.from(str), false)
-        : generator(Buffer.from(str), true);
-    let ret = true;
-    while (true) {
-      const result = nextGen.next();
-      if (result.done || !result.value) break;
-      const [header, body] = result.value;
-      ret = ret && this.socket.write(Buffer.concat([header, body]));
-    }
-    return ret;
-  }
-}
-
 export function header(
   length: number,
   isBinary: boolean,

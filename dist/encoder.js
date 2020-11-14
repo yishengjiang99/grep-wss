@@ -1,17 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -39,50 +26,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generator = exports.header = exports.WsSocket = void 0;
-var events_1 = require("events");
+exports.generator = exports.header = void 0;
 var FRAME_LENGTH = 1024 * 16;
-var WsSocket = /** @class */ (function (_super) {
-    __extends(WsSocket, _super);
-    function WsSocket(socket) {
-        var _this = _super.call(this) || this;
-        _this.socket = socket;
-        return _this;
-    }
-    WsSocket.prototype.write = function (str) {
-        var nextGen = typeof str === "string"
-            ? generator(Buffer.from(str), false)
-            : generator(Buffer.from(str), true);
-        var ret = true;
-        while (true) {
-            var result = nextGen.next();
-            if (result.done || !result.value)
-                break;
-            var _a = __read(result.value, 2), header_1 = _a[0], body = _a[1];
-            ret = ret && this.socket.write(Buffer.concat([header_1, body]));
-        }
-        return ret;
-    };
-    return WsSocket;
-}(events_1.EventEmitter));
-exports.WsSocket = WsSocket;
 function header(length, isBinary, isFirst, isLast, isMasked) {
     if (isMasked === void 0) { isMasked = false; }
     var optCode = isBinary ? 0x02 : 0x01;

@@ -1,2 +1,5 @@
-export { WebSocketServer, WebSocketServerProps} from './server';
-export { wscat } from './wsclient';
+export * from "./server";
+export * from "./encoder";
+export { wscat } from "./wsclient";
+export { WsSocket } from "./WsSocket";
+

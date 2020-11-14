@@ -12,31 +12,59 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebSocketServer = exports.WsServer = void 0;
+exports.shakeHand = exports.WsServer = exports.handleWsRequest = void 0;
 var http_1 = require("http");
 var crypto_1 = require("crypto");
-var encoder_1 = require("./encoder");
+var WsSocket_1 = require("./WsSocket");
 var decoder_1 = require("./decoder");
 var events_1 = require("events");
+exports.handleWsRequest = function (httpd, getHandler) {
+    httpd.on("upgrade", function (req, socket) {
+        exports.shakeHand(socket, req.headers["sec-websocket-key"].toString().trim());
+        getHandler(req.url || "")(new WsSocket_1.WsSocket(socket, req));
+    });
+};
 var WsServer = /** @class */ (function (_super) {
     __extends(WsServer, _super);
     function WsServer(props) {
         var _this = _super.call(this) || this;
         _this.start = function () {
             _this.server.on("upgrade", function (req, socket) {
-                shakeHand(socket, req.headers["sec-websocket-key"].trim());
-                var wsSocket = new encoder_1.WsSocket(socket);
-                _this.emit("connection", [wsSocket, req]);
+                _this.connected.push(socket);
+                exports.shakeHand(socket, req.headers["sec-websocket-key"].trim());
+                var wsSocket = new WsSocket_1.WsSocket(socket);
+                _this.emit("connection", wsSocket, req);
                 socket.on("data", function (d) {
-                    _this.emit("data", [decoder_1.decodeWsMessage(d), wsSocket]);
+                    _this.emit("data", decoder_1.decodeWsMessage(d), wsSocket);
                 });
                 socket.on("close", function () {
-                    wsSocket.write = function (str) { return false; };
+                    _this.emit("close", socket);
+                    _this.connected.forEach(function (_s, idx) {
+                        if (_s === socket) {
+                            _this.connected.splice(idx, 1);
+                        }
+                    });
                 });
             });
-            _this.server.on("listening", function () { return _this.emit("listening", [_this.port]); });
+            _this.server.once("listening", function () { return _this.emit("listening", _this.port); });
             _this.server.listen(_this.port);
+        };
+        _this.stop = function () {
+            _this.connected.forEach(function (_s) { return _s.destroy(); });
+            _this.server.close(function () {
+                console.log("closed");
+            });
         };
         _this.port = props.port || 3000;
         if (props.server)
@@ -46,38 +74,13 @@ var WsServer = /** @class */ (function (_super) {
                 _this.emit("http", [req, res]);
             });
         }
+        _this.connected = [];
         return _this;
     }
     return WsServer;
 }(events_1.EventEmitter));
 exports.WsServer = WsServer;
-function WebSocketServer(props) {
-    var onConnection = props.onConnection, onHttp = props.onHttp, onData = props.onData, onListening = props.onListening, port = props.port;
-    var httpd = http_1.createServer(function (req, res) {
-        onHttp ? onHttp(req, res) : res.end(200);
-    });
-    httpd.on("upgrade", function (req, socket) {
-        var wsSocket = new encoder_1.WsSocket(socket);
-        var session = {};
-        var writeReply = function (msg) {
-            wsSocket.write(msg);
-        };
-        shakeHand(socket, req.headers["sec-websocket-key"].trim());
-        onConnection && onConnection(writeReply, session, socket);
-        onData &&
-            socket.on("data", function (d) {
-                onData(decoder_1.decodeWsMessage(d), function (msg) {
-                    writeReply(msg);
-                }, session, socket);
-            });
-    });
-    httpd.on("error", console.error);
-    onListening && httpd.on("listening", onListening);
-    httpd.listen(port);
-    return httpd;
-}
-exports.WebSocketServer = WebSocketServer;
-var shakeHand = function (socket, key) {
+exports.shakeHand = function (socket, key) {
     var digest = crypto_1.createHash("sha1")
         .update(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
         .digest("base64");
@@ -87,3 +90,4 @@ var shakeHand = function (socket, key) {
     socket.write("Sec-WebSocket-Accept: " + digest + " \r\n");
     socket.write("\r\n");
 };
+__exportStar(require("./legacy-api"), exports);

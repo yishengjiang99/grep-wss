@@ -1,3 +1,6 @@
 /// <reference types="node" />
-import { Interface } from 'readline';
-export declare function wscat(host?: string, port?: number): Interface;
+export declare function wscat(host?: string, port?: number): Promise<{
+    stdout: import("stream").Readable;
+    stdin: import("stream").Writable;
+    stderr: import("stream").Readable;
+}>;
