@@ -20,6 +20,9 @@ export const handleWsRequest = (
   });
 };
 
+/**
+ * @emits http|connection|data
+ */
 export class WsServer extends EventEmitter {
   server: Server;
   port: any;
@@ -40,7 +43,10 @@ export class WsServer extends EventEmitter {
       this.connected.push(socket);
       shakeHand(socket, req.headers["sec-websocket-key"]!.trim());
       const wsSocket: WsSocket = new WsSocket(socket, req);
+
+      /**  @event "connection" @params socket  */
       this.emit("connection", wsSocket, req);
+
       socket.on("data", (d) => {
         this.emit("data", decodeWsMessage(d), wsSocket);
       });

@@ -4,6 +4,10 @@ import { EventEmitter } from "events";
 import { decodeWsMessage } from "./decoder";
 import { IncomingMessage } from "http";
 import { generator } from "./encoder";
+
+/**
+ * @emits data|close|
+ */
 export class WsSocket extends EventEmitter {
   headers: {};
   socket: Socket;
