@@ -6,6 +6,7 @@ export async function wscat(host: string = "localhost", port: number = 3000) {
   const connected = new Promise((resolve) => {
     stdout.on("data", (d) => {
       d.toString().substring("Sec-WebSocket-Accept:");
+      console.log(d.toString());
       resolve();
     });
   });

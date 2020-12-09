@@ -39,7 +39,7 @@ export class WsServer extends EventEmitter {
     this.server.on("upgrade", (req: IncomingMessage, socket: Socket) => {
       this.connected.push(socket);
       shakeHand(socket, req.headers["sec-websocket-key"]!.trim());
-      const wsSocket: WsSocket = new WsSocket(socket);
+      const wsSocket: WsSocket = new WsSocket(socket, req);
       this.emit("connection", wsSocket, req);
       socket.on("data", (d) => {
         this.emit("data", decodeWsMessage(d), wsSocket);

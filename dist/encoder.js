@@ -1,50 +1,22 @@
 "use strict";
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generator = exports.header = void 0;
-var FRAME_LENGTH = 1024 * 16;
-function header(length, isBinary, isFirst, isLast, isMasked) {
-    if (isMasked === void 0) { isMasked = false; }
-    var optCode = isBinary ? 0x02 : 0x01;
-    var b0 = (isFirst ? optCode : 0) + (isLast ? 0x80 : 0);
+const FRAME_LENGTH = 1024 * 16;
+function header(length, isBinary, isFirst, isLast, isMasked = false) {
+    const optCode = isBinary ? 0x02 : 0x01;
+    const b0 = (isFirst ? optCode : 0) + (isLast ? 0x80 : 0);
     if (length <= 0x7e) {
         return Buffer.from([b0, length & 0x7f]);
     }
     else if (length <= 0xffff) {
-        var b = Buffer.alloc(4);
+        const b = Buffer.alloc(4);
         b[0] = b0;
         b[1] = 0x7e;
         b.writeInt16BE(length, 2);
         return b;
     }
     else {
-        var b = Buffer.alloc(10);
+        const b = Buffer.alloc(10);
         b[0] = b0;
         b[1] = 0x7f;
         b.writeInt32BE((length & 0xffff0000) >> 8, 2);
@@ -53,29 +25,16 @@ function header(length, isBinary, isFirst, isLast, isMasked) {
     }
 }
 exports.header = header;
-function generator(buff, isBinary) {
-    var isFirst;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                isFirst = true;
-                _a.label = 1;
-            case 1:
-                if (!(buff.byteLength > FRAME_LENGTH)) return [3 /*break*/, 3];
-                return [4 /*yield*/, [
-                        header(FRAME_LENGTH, isBinary, isFirst, false, false),
-                        buff.slice(0, FRAME_LENGTH),
-                    ]];
-            case 2:
-                _a.sent();
-                isFirst = false;
-                buff = buff.slice(FRAME_LENGTH);
-                return [3 /*break*/, 1];
-            case 3: return [4 /*yield*/, [header(buff.byteLength, isBinary, isFirst, true), buff]];
-            case 4:
-                _a.sent();
-                return [2 /*return*/];
-        }
-    });
+function* generator(buff, isBinary) {
+    let isFirst = true;
+    while (buff.byteLength > FRAME_LENGTH) {
+        yield [
+            header(FRAME_LENGTH, isBinary, isFirst, false, false),
+            buff.slice(0, FRAME_LENGTH),
+        ];
+        isFirst = false;
+        buff = buff.slice(FRAME_LENGTH);
+    }
+    yield [header(buff.byteLength, isBinary, isFirst, true), buff];
 }
 exports.generator = generator;

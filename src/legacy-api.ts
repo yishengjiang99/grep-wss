@@ -3,32 +3,16 @@ import { Socket, Server } from "net";
 import { WsSocket } from "./WsSocket";
 import { decodeWsMessage } from "./decoder";
 import { shakeHand } from "./server";
-type ReplyFunction = (msg: string | Buffer) => void;
-
-export interface WebSocketServerProps {
-  onHttp?: (req: IncomingMessage, res: ServerResponse) => void;
-  onData?: (
-    data: Buffer,
-    reply: ReplyFunction,
-    session?: Record<string, any>,
-    socket?: Socket
-  ) => void;
-  onConnection?: (
-    reply?: ReplyFunction,
-    session?: Record<string, any>,
-    socket?: Socket
-  ) => void;
-  onListening?: () => void;
-  port: number;
-}
+import { WebSocketServerProps, ReplyFunction } from "./typings";
+///reference(path='./typings.d.ts';
 export function WebSocketServer(props: WebSocketServerProps): Server {
   const { onConnection, onHttp, onData, onListening, port } = props;
   const httpd = createServer((req, res) => {
     onHttp ? onHttp(req, res) : res.end(200);
   });
 
-  httpd.on("upgrade", (req: IncomingMessage, socket: Socket) => {
-    const wsSocket: WsSocket = new WsSocket(socket);
+  httpd.on("upgrade", (req: IncomingMessage, socket: Socket, head: Buffer) => {
+    const wsSocket: WsSocket = new WsSocket(socket, req);
 
     const session = {};
     const writeReply: ReplyFunction = (msg: Buffer | string) => {
@@ -40,7 +24,7 @@ export function WebSocketServer(props: WebSocketServerProps): Server {
       socket.on("data", (d) => {
         onData(
           decodeWsMessage(d),
-          (msg) => {
+          (msg: string | Buffer) => {
             writeReply(msg);
           },
           session,

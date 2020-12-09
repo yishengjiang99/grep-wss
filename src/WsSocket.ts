@@ -8,12 +8,10 @@ export class WsSocket extends EventEmitter {
   headers: {};
   socket: Socket;
   closed: boolean = false;
-  trailers: {};
-  constructor(socket: Socket, request?: IncomingMessage) {
+  constructor(socket: Socket, request: IncomingMessage) {
     super();
     this.socket = socket;
-    this.headers = request?.rawHeaders || {};
-    this.trailers = request?.rawTrailers || {};
+    this.headers = request.headers;
     this.socket.on("data", (d) => {
       this.emit("data", decodeWsMessage(d));
     });
