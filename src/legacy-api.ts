@@ -18,7 +18,7 @@ export function WebSocketServer(props: WebSocketServerProps): Server {
     const writeReply: ReplyFunction = (msg: Buffer | string) => {
       wsSocket.write(msg);
     };
-    shakeHand(socket, req.headers["sec-websocket-key"]!.trim());
+    shakeHand(socket,req.headers);
     onConnection && onConnection(writeReply, session, socket);
     onData &&
       socket.on("data", (d) => {

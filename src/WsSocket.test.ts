@@ -27,7 +27,7 @@ describe("WsSocket", () => {
       (req: IncomingMessage, socket: Socket, head: Buffer) => {
         const ws = new WsSocket(socket, req);
 
-        shakeHand(socket, "key");
+        shakeHand(socket, req.headers);
 
         expect(ws.headers).exist;
         socket.prependListener("data", (d) => {

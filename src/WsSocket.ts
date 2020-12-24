@@ -4,10 +4,6 @@ import { EventEmitter } from "events";
 import { decodeWsMessage } from "./decoder";
 import { IncomingMessage } from "http";
 import { generator } from "./encoder";
-
-/**
- * @emits data|close|
- */
 export class WsSocket extends EventEmitter {
   headers: {};
   socket: Socket;
@@ -24,8 +20,11 @@ export class WsSocket extends EventEmitter {
       this.emit("close", []);
     });
   }
-
+  send(str:any):boolean{
+    return this.write(str);
+  }
   write(str: Uint8Array | string): boolean {
+    if(this.closed) return false;
     const nextGen =
       typeof str === "string"
         ? generator(Buffer.from(str), false)

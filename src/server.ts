@@ -1,13 +1,13 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { createServer, IncomingHttpHeaders, IncomingMessage, ServerResponse } from "http";
 import { createHash } from "crypto";
 import { Socket, Server } from "net";
 import { WsSocket } from "./WsSocket";
 import { decodeWsMessage } from "./decoder";
 import { EventEmitter } from "events";
 import { Server as HttpServer } from "http";
-import { Server as HttpsServer } from "https";
+import {Server as HttpsServer } from "https";
 
-export type ConnectionHandler = (connection: WsSocket) => void;
+export type ConnectionHandler = (connection: WsSocket,request?:any) => void;
 export type RouteConnectionHandler = (uri: string) => ConnectionHandler;
 
 export const handleWsRequest = (
@@ -15,14 +15,11 @@ export const handleWsRequest = (
   getHandler: RouteConnectionHandler
 ) => {
   httpd.on("upgrade", (req: IncomingMessage, socket: Socket) => {
-    shakeHand(socket, req.headers["sec-websocket-key"]!.toString().trim());
-    getHandler(req.url || "")(new WsSocket(socket, req));
+    shakeHand(socket, req.headers);
+    getHandler(req.url || "")(new WsSocket(socket, req),req);
   });
 };
 
-/**
- * @emits http|connection|data
- */
 export class WsServer extends EventEmitter {
   server: Server;
   port: any;
@@ -40,13 +37,11 @@ export class WsServer extends EventEmitter {
   }
   start = () => {
     this.server.on("upgrade", (req: IncomingMessage, socket: Socket) => {
-      this.connected.push(socket);
-      shakeHand(socket, req.headers["sec-websocket-key"]!.trim());
+
+      shakeHand(socket, req.headers);
+
       const wsSocket: WsSocket = new WsSocket(socket, req);
-
-      /**  @event "connection" @params socket  */
       this.emit("connection", wsSocket, req);
-
       socket.on("data", (d) => {
         this.emit("data", decodeWsMessage(d), wsSocket);
       });
@@ -70,14 +65,19 @@ export class WsServer extends EventEmitter {
   };
 }
 
-export const shakeHand = (socket: Socket, key: string) => {
+export const shakeHand = (socket: Socket, headers:IncomingHttpHeaders) => {
+  if(!headers["Sec-WebSocket-Key"])return;
+  const key = headers["Sec-WebSocket-Key"]!.toString().trim();
+  const proto = headers["Sec-WebSocket-Protocol"]!.toString().trim();
   const digest = createHash("sha1")
     .update(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
     .digest("base64");
-  socket.write("HTTP/1.1 101 Switching Protocols \r\n");
-  socket.write("Upgrade: websocket \r\n");
-  socket.write("Connection: Upgrade \r\n");
-  socket.write(`Sec-WebSocket-Accept: ${digest} \r\n`);
+    
+  socket.write("HTTP/1.1 101 Switching Protocols\r\n");
+  socket.write("Upgrade: websocket\r\n");
+  socket.write("Connection: Upgrade\r\n");
+  socket.write(`Sec-WebSocket-Accept: ${digest}\r\n`);
+  if(proto) socket.write(`Sec-WebSocket-Protocol: ${proto.trim().split(/ *, */)}\r\n`);
   socket.write("\r\n");
 };
 export * from "./legacy-api";

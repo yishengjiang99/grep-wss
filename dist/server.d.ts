@@ -7,6 +7,9 @@ import { Server as HttpsServer } from "https";
 export declare type ConnectionHandler = (connection: WsSocket) => void;
 export declare type RouteConnectionHandler = (uri: string) => ConnectionHandler;
 export declare const handleWsRequest: (httpd: HttpServer | HttpsServer, getHandler: RouteConnectionHandler) => void;
+/**
+ * @emits http|connection|data
+ */
 export declare class WsServer extends EventEmitter {
     server: Server;
     port: any;

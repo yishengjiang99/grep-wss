@@ -22,6 +22,9 @@ exports.handleWsRequest = (httpd, getHandler) => {
         getHandler(req.url || "")(new WsSocket_1.WsSocket(socket, req));
     });
 };
+/**
+ * @emits http|connection|data
+ */
 class WsServer extends events_1.EventEmitter {
     constructor(props) {
         super();
@@ -29,7 +32,8 @@ class WsServer extends events_1.EventEmitter {
             this.server.on("upgrade", (req, socket) => {
                 this.connected.push(socket);
                 exports.shakeHand(socket, req.headers["sec-websocket-key"].trim());
-                const wsSocket = new WsSocket_1.WsSocket(socket);
+                const wsSocket = new WsSocket_1.WsSocket(socket, req);
+                /**  @event "connection" @params socket  */
                 this.emit("connection", wsSocket, req);
                 socket.on("data", (d) => {
                     this.emit("data", decoder_1.decodeWsMessage(d), wsSocket);
@@ -50,6 +54,7 @@ class WsServer extends events_1.EventEmitter {
             this.connected.forEach((_s) => _s.destroy());
             this.server.close(() => {
                 console.log("closed");
+                this.emit("closed");
             });
         };
         this.port = props.port || 3000;
