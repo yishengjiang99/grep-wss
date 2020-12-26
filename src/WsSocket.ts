@@ -14,7 +14,7 @@ export class WsSocket extends EventEmitter {
     this.socket = socket;
     this.headers = request.headers;
     if (!request.headers["sec-websocket-key"]) throw "no sec key";
-    this.webSocketKey = request.headers["sec-websocket-key"];
+    this.webSocketKey = request.headers["sec-websocket-key"] as string;
     this.socket.on("data", (d) => {
       console.log(d.toString());
       this.emit("data", decodeWsMessage(d));

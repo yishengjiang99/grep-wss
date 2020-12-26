@@ -1,12 +1,20 @@
 {
   "name": "grep-wss",
-  "version": "1.1.2",
-  "description": "now with npm postinstall!",
+  "version": "1.1.6",
+  "description": "removed the yoke of mocha/chai dual oppressionist npm modules",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "postinstall": "tsc",
     "test": "mocha"
+  },
+  "mocha": {
+    "require": [
+      "ts-node/register"
+    ],
+    "spec": [
+      "./src/*.test.ts"
+    ]
   },
   "repository": {
     "type": "git",
@@ -17,6 +25,5 @@
   "bugs": {
     "url": "https://github.com/yishengjiang99/grep-wss/issues"
   },
-  "homepage": "https://github.com/yishengjiang99/grep-wss#readme",
-  "dependencies": {}
+  "homepage": "https://github.com/yishengjiang99/grep-wss#readme"
 }
