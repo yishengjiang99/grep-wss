@@ -6,61 +6,17 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "postinstall": "tsc",
-    "test": "mocha",
-    "coverage": "nyc npm test"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yishengjiang99/grep-wss.git"
   },
-  "author": "",
+  "author": "伟大的无产阶级劳动人民",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/yishengjiang99/grep-wss/issues"
   },
   "homepage": "https://github.com/yishengjiang99/grep-wss#readme",
-  "devDependencies": {
-    "@types/chai": "^4.2.14",
-    "@types/mocha": "^8.2.0",
-    "chai": "^4.2.0"
-  },
-  "nyc": {
-    "all": true,
-    "reporter": [
-      "lcov",
-      "text",
-      "text-summary"
-    ],
-    "exclude": [
-      "*clap.js",
-      "*clap.ts",
-      "coverage",
-      "dist",
-      "docs",
-      "gulpfile.js",
-      "test",
-      "xrun*.js",
-      "xrun*.ts",
-      "lib",
-      "config"
-    ],
-    "check-coverage": false,
-    "statements": 60,
-    "branches": 60,
-    "functions": 60,
-    "lines": 60,
-    "cache": true,
-    "extends": [
-      "@istanbuljs/nyc-config-typescript"
-    ]
-  },
-  "mocha": {
-    "require": [
-      "ts-node/register",
-      "setup.js"
-    ],
-    "recursive": true,
-    "spec": "src/*.test.ts"
-  },
   "dependencies": {}
 }
