@@ -3,7 +3,7 @@ import { Socket, Server } from "net";
 import { WsSocket } from "./WsSocket";
 import { decodeWsMessage } from "./decoder";
 import { shakeHand } from "./server";
-import { WebSocketServerProps, ReplyFunction } from "./typings";
+import { WebSocketServerProps, ReplyFunction } from "./index";
 ///reference(path='./typings.d.ts';
 export function WebSocketServer(props: WebSocketServerProps): Server {
   const { onConnection, onHttp, onData, onListening, port } = props;
@@ -18,7 +18,7 @@ export function WebSocketServer(props: WebSocketServerProps): Server {
     const writeReply: ReplyFunction = (msg: Buffer | string) => {
       wsSocket.write(msg);
     };
-    shakeHand(socket,req.headers);
+    shakeHand(socket, req.headers);
     onConnection && onConnection(writeReply, session, socket);
     onData &&
       socket.on("data", (d) => {

@@ -1,10 +1,11 @@
 {
   "name": "grep-wss",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "postinstall": "tsc",
     "test": "mocha",
     "coverage": "nyc npm test"
   },
@@ -20,7 +21,8 @@
   "homepage": "https://github.com/yishengjiang99/grep-wss#readme",
   "devDependencies": {
     "@types/chai": "^4.2.14",
-    "@types/mocha": "^8.2.0"
+    "@types/mocha": "^8.2.0",
+    "chai": "^4.2.0"
   },
   "nyc": {
     "all": true,
@@ -59,5 +61,8 @@
     ],
     "recursive": true,
     "spec": "src/*.test.ts"
+  },
+  "dependencies": {
+    "wscat": "^4.0.1"
   }
 }

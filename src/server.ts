@@ -1,13 +1,18 @@
-import { createServer, IncomingHttpHeaders, IncomingMessage, ServerResponse } from "http";
+import {
+  createServer,
+  IncomingHttpHeaders,
+  IncomingMessage,
+  ServerResponse,
+} from "http";
 import { createHash } from "crypto";
 import { Socket, Server } from "net";
 import { WsSocket } from "./WsSocket";
 import { decodeWsMessage } from "./decoder";
 import { EventEmitter } from "events";
 import { Server as HttpServer } from "http";
-import {Server as HttpsServer } from "https";
+import { Server as HttpsServer } from "https";
 
-export type ConnectionHandler = (connection: WsSocket,request?:any) => void;
+export type ConnectionHandler = (connection: WsSocket, request?: any) => void;
 export type RouteConnectionHandler = (uri: string) => ConnectionHandler;
 
 export const handleWsRequest = (
@@ -16,7 +21,7 @@ export const handleWsRequest = (
 ) => {
   httpd.on("upgrade", (req: IncomingMessage, socket: Socket) => {
     shakeHand(socket, req.headers);
-    getHandler(req.url || "")(new WsSocket(socket, req),req);
+    getHandler(req.url || "")(new WsSocket(socket, req), req);
   });
 };
 
@@ -37,7 +42,7 @@ export class WsServer extends EventEmitter {
   }
   start = () => {
     this.server.on("upgrade", (req: IncomingMessage, socket: Socket) => {
-
+      console.log("onupgrade", req.headers);
       shakeHand(socket, req.headers);
 
       const wsSocket: WsSocket = new WsSocket(socket, req);
@@ -65,19 +70,26 @@ export class WsServer extends EventEmitter {
   };
 }
 
-export const shakeHand = (socket: Socket, headers:IncomingHttpHeaders) => {
-  if(!headers["Sec-WebSocket-Key"])return;
-  const key = headers["Sec-WebSocket-Key"]!.toString().trim();
-  const proto = headers["Sec-WebSocket-Protocol"]!.toString().trim();
+export const shakeHand = (socket: Socket, headers: IncomingHttpHeaders) => {
+  //if (!headers["Sec-WebSocket-Key"]) return;
+
+  const key = headers["sec-websocket-key"]!.toString().trim();
+  const proto = headers["sec-websocket-protocol"]
+    ? headers["sec-websocket-protocol"].toString().trim()
+    : "";
   const digest = createHash("sha1")
     .update(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
     .digest("base64");
-    
-  socket.write("HTTP/1.1 101 Switching Protocols\r\n");
-  socket.write("Upgrade: websocket\r\n");
-  socket.write("Connection: Upgrade\r\n");
-  socket.write(`Sec-WebSocket-Accept: ${digest}\r\n`);
-  if(proto) socket.write(`Sec-WebSocket-Protocol: ${proto.trim().split(/ *, */)}\r\n`);
-  socket.write("\r\n");
+  const socketwrite = (str: string) => {
+    // console.log(str);
+    socket.write(str);
+  };
+  socketwrite("HTTP/1.1 101 Switching Protocols\r\n");
+  socketwrite("Upgrade: websocket\r\n");
+  socketwrite("Connection: Upgrade\r\n");
+  socketwrite(`Sec-WebSocket-Accept: ${digest}\r\n`);
+  if (proto)
+    socketwrite(`Sec-WebSocket-Protocol: ${proto.trim().split(/ *, */)}\r\n`);
+  socketwrite("\r\n");
 };
 export * from "./legacy-api";

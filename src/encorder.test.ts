@@ -19,6 +19,8 @@
 //   t.end();
 // });
 
+import { header } from "./encoder";
+import { expect } from "chai";
 // test("generator", function (t) {
 //   t.plan(6);
 //   const buff = Buffer.alloc(0xff);
@@ -34,3 +36,9 @@
 //   t.equal(gen.next().done, true);
 //   t.equal(gen.next().value, undefined);
 // });
+
+describe("encoder", () => {
+  it("encodes head and body", () => {
+    expect(header(1, false, true, true)).to.deep.eq(Buffer.from([0x81, 0x01]));
+  });
+});
