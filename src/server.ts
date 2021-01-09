@@ -42,7 +42,6 @@ export class WsServer extends EventEmitter {
   }
   start = () => {
     this.server.on("upgrade", (req: IncomingMessage, socket: Socket) => {
-      console.log("onupgrade", req.headers);
       shakeHand(socket, req.headers);
 
       const wsSocket: WsSocket = new WsSocket(socket, req);
@@ -90,6 +89,10 @@ export const shakeHand = (socket: Socket, headers: IncomingHttpHeaders) => {
   socketwrite(`Sec-WebSocket-Accept: ${digest}\r\n`);
   if (proto)
     socketwrite(`Sec-WebSocket-Protocol: ${proto.trim().split(/ *, */)}\r\n`);
+  socketwrite(
+    `Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=10 \r\n`
+  );
+
   socketwrite("\r\n");
 };
 export * from "./legacy-api";
