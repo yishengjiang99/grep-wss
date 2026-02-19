@@ -10,6 +10,7 @@
     "test": "mocha"
   },
   "mocha": {
+    "exit": true,
     "node-option": [
       "import=tsx"
     ],

@@ -61,8 +61,4 @@ describe("WsSocket", () => {
     // setTimeout(done, 2300);
   }).timeout(100232);
 });
-process.stdin.on("data", (d) => {
-  if (d.toString().trim() === "?") {
-    console.log(process.report && process.report.writeReport());
-  }
-});
+
