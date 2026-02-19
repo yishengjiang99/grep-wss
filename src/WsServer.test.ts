@@ -1,10 +1,7 @@
 //@ts-ignore
 import { expect } from "../chai.min.js";
-import { cspawn, wscat, WsSocket } from ".";
-import { WsServer } from "./";
-import { decodeWsMessage } from "./decoder";
-//@ts-ignore
-import { expect } from "../chai.min.js";
+import { cspawn, wscat, WsSocket } from "./index";
+import { WsServer } from "./index";
 //@ts-ignore
 import { describe, afterEach, it, done } from "../mocha.min.js";
 describe("wsserver", () => {

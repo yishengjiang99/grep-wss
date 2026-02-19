@@ -1,5 +1,4 @@
 import { Socket } from "net";
-import { Writable, PassThrough, Transform } from "stream";
 import { EventEmitter } from "events";
 import { decodeWsMessage } from "./decoder";
 import { IncomingMessage } from "http";
@@ -13,10 +12,9 @@ export class WsSocket extends EventEmitter {
     super();
     this.socket = socket;
     this.headers = request.headers;
-    if (!request.headers["sec-websocket-key"]) throw "no sec key";
+    if (!request.headers["sec-websocket-key"]) throw new Error("no sec key");
     this.webSocketKey = request.headers["sec-websocket-key"] as string;
     this.socket.on("data", (d) => {
-      console.log(d.toString());
       this.emit("data", decodeWsMessage(d));
     });
     this.socket.on("close", () => {

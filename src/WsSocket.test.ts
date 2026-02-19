@@ -5,14 +5,14 @@ import { Socket, createConnection } from "net";
 import { createServer, IncomingMessage } from "http";
 import { execSync } from "child_process";
 import { shakeHand } from "./server";
-import { WsServer } from ".";
+import { WsServer } from "./index";
 //@ts-ignore
 import { expect } from "../chai.min.js";
 
 //@ts-ignore
 import { describe, afterEach, it, done as donefn } from "../mocha.min.js";
 describe("WsSocket", () => {
-  let server: WsServer;
+  let server: WsServer | undefined;
   afterEach(() => {
     if (server) server.stop();
   });

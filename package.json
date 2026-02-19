@@ -5,12 +5,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "postinstall": "tsc",
     "test": "mocha"
   },
   "mocha": {
-    "require": [
-      "ts-node/register"
+    "node-option": [
+      "import=tsx"
     ],
     "spec": [
       "./src/*.test.ts"

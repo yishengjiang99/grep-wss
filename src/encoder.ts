@@ -22,8 +22,8 @@ export function header(
     const b = Buffer.alloc(10);
     b[0] = b0;
     b[1] = 0x7f;
-    b.writeInt32BE((length & 0xffff0000) >> 8, 2);
-    b.writeInt32BE(length & 0x0000ffff, 6);
+    b.writeUInt32BE(Math.floor(length / 0x100000000), 2);
+    b.writeUInt32BE(length >>> 0, 6);
     return b;
   }
 }
