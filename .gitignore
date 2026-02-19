@@ -1,3 +1,4 @@
 node_modules/**/*
 node_modules/*
-node_modulesgit 
+node_modulesgit
+dist/

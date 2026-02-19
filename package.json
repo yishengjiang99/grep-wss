@@ -5,12 +5,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "postinstall": "tsc",
     "test": "mocha"
   },
   "mocha": {
-    "require": [
-      "ts-node/register"
+    "node-option": [
+      "import=tsx"
     ],
     "spec": [
       "./src/*.test.ts"
@@ -25,5 +26,12 @@
   "bugs": {
     "url": "https://github.com/yishengjiang99/grep-wss/issues"
   },
-  "homepage": "https://github.com/yishengjiang99/grep-wss#readme"
+  "homepage": "https://github.com/yishengjiang99/grep-wss#readme",
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "mocha": "^11.7.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
 }

@@ -9,7 +9,7 @@ export const decodeWsMessage = (msg: any): Buffer => {
   else maskOffset = 12;
   const dataOffset = maskOffset + (masked ? 4 : 0);
   if (!masked) {
-    msg.slice(dataOffset);
+    return msg.slice(dataOffset);
   }
   const mask = msg.slice(maskOffset, maskOffset + 4);
   msg = msg.slice(dataOffset);

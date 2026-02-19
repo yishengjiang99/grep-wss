@@ -2,12 +2,10 @@ import {
   createServer,
   IncomingHttpHeaders,
   IncomingMessage,
-  ServerResponse,
 } from "http";
 import { createHash } from "crypto";
 import { Socket, Server } from "net";
 import { WsSocket } from "./WsSocket";
-import { decodeWsMessage } from "./decoder";
 import { EventEmitter } from "events";
 import { Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
@@ -45,17 +43,17 @@ export class WsServer extends EventEmitter {
       shakeHand(socket, req.headers);
 
       const wsSocket: WsSocket = new WsSocket(socket, req);
+      this.connected.push(socket);
       this.emit("connection", wsSocket, req);
-      socket.on("data", (d) => {
-        this.emit("data", decodeWsMessage(d), wsSocket);
+      wsSocket.on("data", (d) => {
+        this.emit("data", d, wsSocket);
       });
-      socket.on("close", () => {
+      wsSocket.on("close", () => {
         this.emit("close", socket);
-        this.connected.forEach((_s, idx) => {
-          if (_s === socket) {
-            this.connected.splice(idx, 1);
-          }
-        });
+        const idx = this.connected.indexOf(socket);
+        if (idx !== -1) {
+          this.connected.splice(idx, 1);
+        }
       });
     });
     this.server.once("listening", () => this.emit("listening", this.port));
@@ -70,9 +68,9 @@ export class WsServer extends EventEmitter {
 }
 
 export const shakeHand = (socket: Socket, headers: IncomingHttpHeaders) => {
-  //if (!headers["Sec-WebSocket-Key"]) return;
+  if (!headers["sec-websocket-key"]) return;
 
-  const key = headers["sec-websocket-key"]!.toString().trim();
+  const key = headers["sec-websocket-key"].toString().trim();
   const proto = headers["sec-websocket-protocol"]
     ? headers["sec-websocket-protocol"].toString().trim()
     : "";
@@ -95,4 +93,3 @@ export const shakeHand = (socket: Socket, headers: IncomingHttpHeaders) => {
 
   socketwrite("\r\n");
 };
-export * from "./legacy-api";
