@@ -24,7 +24,7 @@ export type ReplyFunction = (msg: string | Buffer) => void;
 export function WebSocketServer(props: WebSocketServerProps): Server {
   const { onConnection, onHttp, onData, onListening, port } = props;
   const httpd = createServer((req, res) => {
-    onHttp ? onHttp(req, res) : res.end(200);
+    onHttp ? onHttp(req, res) : res.end();
   });
 
   httpd.on("upgrade", (req: IncomingMessage, socket: Socket, head: Buffer) => {

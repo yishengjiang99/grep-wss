@@ -25,9 +25,9 @@ export const handleWsRequest = (
 
 export class WsServer extends EventEmitter {
   server: Server;
-  port: any;
+  port: number;
   connected: Socket[];
-  constructor(props: { port?: any; server?: Server }) {
+  constructor(props: { port?: number; server?: Server }) {
     super();
     this.port = props.port || 3000;
     if (props.server) this.server = props.server;
@@ -61,9 +61,7 @@ export class WsServer extends EventEmitter {
   };
   stop = () => {
     this.connected.forEach((_s) => _s.destroy());
-    this.server.close(() => {
-      console.log("closed");
-    });
+    this.server.close();
   };
 }
 

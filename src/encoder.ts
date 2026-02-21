@@ -6,7 +6,7 @@ export function header(
   isBinary: boolean,
   isFirst: boolean,
   isLast: boolean,
-  isMasked: boolean = false
+  _isMasked: boolean = false
 ) {
   const optCode = isBinary ? 0x02 : 0x01;
   const b0 = (isFirst ? optCode : 0) + (isLast ? 0x80 : 0);
@@ -36,10 +36,10 @@ export function* generator(
   while (buff.byteLength > FRAME_LENGTH) {
     yield [
       header(FRAME_LENGTH, isBinary, isFirst, false, false),
-      buff.slice(0, FRAME_LENGTH),
+      buff.subarray(0, FRAME_LENGTH),
     ];
     isFirst = false;
-    buff = buff.slice(FRAME_LENGTH);
+    buff = buff.subarray(FRAME_LENGTH);
   }
 
   yield [header(buff.byteLength, isBinary, isFirst, true), buff];
