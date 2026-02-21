@@ -27,7 +27,7 @@ export function WebSocketServer(props: WebSocketServerProps): Server {
     onHttp ? onHttp(req, res) : res.end();
   });
 
-  httpd.on("upgrade", (req: IncomingMessage, socket: Socket, head: Buffer) => {
+  httpd.on("upgrade", (req: IncomingMessage, socket: Socket, _head: Buffer) => {
     shakeHand(socket, req.headers);
     const wsSocket: WsSocket = new WsSocket(socket, req);
 

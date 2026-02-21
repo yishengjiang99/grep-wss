@@ -22,7 +22,7 @@ export class WsSocket extends EventEmitter {
       this.emit("close", []);
     });
   }
-  send(str: any): boolean {
+  send(str: Uint8Array | string): boolean {
     return this.write(str);
   }
   write(str: Uint8Array | string): boolean {
@@ -36,7 +36,6 @@ export class WsSocket extends EventEmitter {
       const result = nextGen.next();
       if (result.done || !result.value) break;
       const [header, body] = result.value;
-      if (!this.socket) continue;
       ret = ret && this.socket.write(Buffer.concat([header, body]));
     }
     return ret;

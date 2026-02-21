@@ -10,7 +10,7 @@ import { EventEmitter } from "events";
 import { Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
 
-export type ConnectionHandler = (connection: WsSocket, request?: any) => void;
+export type ConnectionHandler = (connection: WsSocket, request?: IncomingMessage) => void;
 export type RouteConnectionHandler = (uri: string) => ConnectionHandler;
 
 export const handleWsRequest = (
@@ -75,19 +75,14 @@ export const shakeHand = (socket: Socket, headers: IncomingHttpHeaders) => {
   const digest = createHash("sha1")
     .update(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
     .digest("base64");
-  const socketwrite = (str: string) => {
-    // console.log(str);
-    socket.write(str);
-  };
-  socketwrite("HTTP/1.1 101 Switching Protocols\r\n");
-  socketwrite("Upgrade: websocket\r\n");
-  socketwrite("Connection: Upgrade\r\n");
-  socketwrite(`Sec-WebSocket-Accept: ${digest}\r\n`);
+  socket.write("HTTP/1.1 101 Switching Protocols\r\n");
+  socket.write("Upgrade: websocket\r\n");
+  socket.write("Connection: Upgrade\r\n");
+  socket.write(`Sec-WebSocket-Accept: ${digest}\r\n`);
   if (proto)
-    socketwrite(`Sec-WebSocket-Protocol: ${proto.trim().split(/ *, */)}\r\n`);
-  socketwrite(
+    socket.write(`Sec-WebSocket-Protocol: ${proto.trim().split(/ *, */)[0]}\r\n`);
+  socket.write(
     `Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=10 \r\n`
   );
-
-  socketwrite("\r\n");
+  socket.write("\r\n");
 };

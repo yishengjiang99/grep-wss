@@ -16,7 +16,7 @@ export function header(
     const b = Buffer.alloc(4);
     b[0] = b0;
     b[1] = 0x7e;
-    b.writeInt16BE(length, 2);
+    b.writeUInt16BE(length, 2);
     return b;
   } else {
     const b = Buffer.alloc(10);
