@@ -1,10 +1,10 @@
 import { Socket } from "net";
 import { EventEmitter } from "events";
 import { decodeWsMessage } from "./decoder";
-import { IncomingMessage } from "http";
+import { IncomingHttpHeaders, IncomingMessage } from "http";
 import { generator } from "./encoder";
 export class WsSocket extends EventEmitter {
-  headers: {};
+  headers: IncomingHttpHeaders;
   socket: Socket;
   closed: boolean = false;
   webSocketKey: string;
@@ -14,7 +14,7 @@ export class WsSocket extends EventEmitter {
     this.headers = request.headers;
     if (!request.headers["sec-websocket-key"]) throw new Error("no sec key");
     this.webSocketKey = request.headers["sec-websocket-key"] as string;
-    this.socket.on("data", (d) => {
+    this.socket.on("data", (d: Buffer) => {
       this.emit("data", decodeWsMessage(d));
     });
     this.socket.on("close", () => {
@@ -22,7 +22,7 @@ export class WsSocket extends EventEmitter {
       this.emit("close", []);
     });
   }
-  send(str: any): boolean {
+  send(str: Uint8Array | string): boolean {
     return this.write(str);
   }
   write(str: Uint8Array | string): boolean {
@@ -36,7 +36,6 @@ export class WsSocket extends EventEmitter {
       const result = nextGen.next();
       if (result.done || !result.value) break;
       const [header, body] = result.value;
-      if (!this.socket) continue;
       ret = ret && this.socket.write(Buffer.concat([header, body]));
     }
     return ret;
